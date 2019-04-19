@@ -26,7 +26,11 @@ class RoomsController < ApplicationController
 
   def show
     @room_message = RoomMessage.new room: @room
-    @room_messages = @room.room_messages.includes(:user)
+    if @room.present?
+      @room_messages = @room.room_messages.includes(:user)
+    else
+      redirect_to rooms_path
+    end
   end
 
   def destroy
@@ -76,7 +80,9 @@ class RoomsController < ApplicationController
   protected
 
   def load_entities
-     @room = Room.find(params[:id]) if params[:id]
+    if Room.where(id: params[:id]).present?
+      @room = Room.find(params[:id]) if params[:id]
+    end
   end
 
   def permitted_parameters
