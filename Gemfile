@@ -46,12 +46,22 @@ group :development do
 end
 
 group :test do
+  # Use sqlite3 as the database for Active Record
+  gem 'sqlite3', '~>1.3.6'
+  # Call 'byebug' anywhere in the code 
+  gem 'byebug', platform: :mri
+
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15'
   gem 'selenium-webdriver'
   # Easy installation and use of chromedriver to run system tests with Chrome
   gem 'chromedriver-helper'
 end
+
+group :production do
+  gem 'pg'
+  gem 'rails_12factor'
+end  
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
