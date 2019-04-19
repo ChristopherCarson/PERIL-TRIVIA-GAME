@@ -31,7 +31,6 @@ class RoomsController < ApplicationController
     else
       redirect_to rooms_path
     end
-    
   end
 
   def destroy
