@@ -14,9 +14,11 @@
 <p>Players Ready:</p>
 
 <p data-role="display-ready-players">
-<% $usersReady[@room.id].each do |player| %>
-<%= player %><br />
-<% end %> </p>
+<% if $usersReady[@room.id].present? %>
+  <% $usersReady[@room.id].each do |player| %>
+  <%= player %><br />
+  <% end %> 
+<% end %></p>
 
 
 <div style="height:5vh;"></div>
