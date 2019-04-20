@@ -15,8 +15,11 @@ class GameBoard < ActiveRecord::Base
         
         self.categories << Category.find_by_sql(
             "SELECT * FROM categories
+             WHERE api_category_id IN
+                (SELECT api_category_id FROM clues
+                WHERE value = " + value_filter.to_s + ")
              ORDER BY Random()
-             LIMIT 6")
+             LIMIT " + @@num_categories.to_s)
         self.save()
     end
 end
