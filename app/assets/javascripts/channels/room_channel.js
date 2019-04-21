@@ -1,11 +1,13 @@
 $(function() {
   $('[data-channel-subscribe="room"]').each(function(index, element) {
     var $element = $(element),
-        room_id = $element.data('room-id')
+        room_id = $element.data('room-id');
+        chatArea = $('[data-role="chat"]');
         messageTemplate = $('[data-role="message-template"]');
         dataArea = $('[data-role="display-raw-data"]');
         timerArea = $('[data-role="display-timer"]');
         playersReadyArea = $('[data-role="display-ready-players"]');
+        buzzerModal = $('[data-role="buzzerModal"]');
 
     $element.animate({ scrollTop: $element.prop("scrollHeight")}, 1000)        
 
@@ -22,14 +24,17 @@ $(function() {
           content.find('[data-role="message-text"]').text(data.message);
           content.find('[data-role="message-date"]').text(data.updated_at);
           
-          $element.append(content);
-          $element.animate({ scrollTop: $element.prop("scrollHeight")}, 1000);
+          chatArea.append(content);
+          chatArea.animate({ scrollTop: chatArea.prop("scrollHeight")}, 1000);
           }
           if (data.timer !=null){
-          timerArea.text(JSON.stringify(data.timer));
+            timerArea.text(JSON.stringify(data.timer));
+            if (data.timer == 1){
+            buzzerModal.modal('toggle')
+            }
           }
           if (data.usersReady !=null){
-          var players = ''
+          var players = 'Players Ready:<br/>'
           for (var i = 0; i < data.usersReady.length; i++){
             players = players + data.usersReady[i] + '<br/>'
           }

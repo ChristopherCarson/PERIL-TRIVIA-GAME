@@ -2,7 +2,7 @@ class Game < ApplicationRecord
     has_many :game_boards
     
     @@API_URL = "http://jservice.io/api/"
-    @@clue_sets = 50 
+    @@clue_sets = 100 
     
     #Creates a game board.
     def createGameBoard(boardtype)
@@ -11,7 +11,6 @@ class Game < ApplicationRecord
         
         _gameboard.getCategories()
         self.save()
-        return _gameboard
     end
     
     #Performs initial population of game database from API.
@@ -51,12 +50,11 @@ class Game < ApplicationRecord
     
     #Retrieves categories from API
     def retrieveCategories
-        #10000 to pull from a wide range of the API's category list.
-        
         _responses = []
         for i in 0..@@clue_sets - 1 do
-            _Offset = rand(15000)
-            _URL = @@API_URL + "categories?count=100&offset=" + (_Offset + (i * 100)).to_s
+            puts "Num calls remaining: " + (@@clue_sets - i).to_s 
+            puts "REST CALL TO " + @@API_URL + "categories?count=100&offset=" + (i * 100).to_s
+            _URL = @@API_URL + "categories?count=100&offset=" + (i * 100).to_s
             _responses << JSON.parse(RestClient.get(_URL)).select do |hash|
                 hash["clues_count"] == 5
             end
@@ -68,6 +66,8 @@ class Game < ApplicationRecord
     def retrieveClues(categories)
         _responses = []
         for i in 0..categories.count - 1
+            puts "Num calls remaining: " + (categories.count - i).to_s  
+            puts "REST CALL TO " + @@API_URL + "clues?category=" + categories[i]["id"].to_s
             _URL = @@API_URL + "clues?category=" + categories[i]["id"].to_s
             _responses << JSON.parse(RestClient.get(_URL))
         end

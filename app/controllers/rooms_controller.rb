@@ -4,6 +4,8 @@ class RoomsController < ApplicationController
   # @room = current room when applicable
   before_action :load_entities
   $usersReady = []
+  $games = []
+  $startingBoard = []
 
   def index
     @rooms = Room.all
@@ -22,13 +24,22 @@ class RoomsController < ApplicationController
     else
       render :new
     end
+    
+    $games[@room.id] = Game.new()
+    $games[@room.id].createGameBoard("single")
+    $startingBoard[@room.id] = $games[@room.id].game_boards[0]
   end
 
   def show
-    @room_message = RoomMessage.new room: @room
-    if @room.present?
-      @room_messages = @room.room_messages.includes(:user)
+    if $games[@room.id].present?
+      @room_message = RoomMessage.new room: @room
+      if @room.present?
+        @room_messages = @room.room_messages.includes(:user)
+     else
+        redirect_to rooms_path
+      end
     else
+      @room.destroy()
       redirect_to rooms_path
     end
   end
@@ -47,7 +58,7 @@ class RoomsController < ApplicationController
   def countdown
     Thread.new do
       Rails.application.executor.wrap do
-        i=10
+        i=3
         while i > -1  do
           RoomChannel.broadcast_to @room,  timer: i, user: current_user
           sleep 1
