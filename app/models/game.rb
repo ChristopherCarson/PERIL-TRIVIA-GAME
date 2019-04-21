@@ -2,7 +2,7 @@ class Game < ApplicationRecord
     has_many :game_boards
     
     @@API_URL = "http://jservice.io/api/"
-    @@clue_sets = 10 
+    @@clue_sets = 50 
     
     #Creates a game board.
     def createGameBoard(boardtype)
@@ -11,6 +11,7 @@ class Game < ApplicationRecord
         
         _gameboard.getCategories()
         self.save()
+        return _gameboard
     end
     
     #Performs initial population of game database from API.
@@ -51,10 +52,10 @@ class Game < ApplicationRecord
     #Retrieves categories from API
     def retrieveCategories
         #10000 to pull from a wide range of the API's category list.
-        _Offset = rand(10000)
         
         _responses = []
         for i in 0..@@clue_sets - 1 do
+            _Offset = rand(15000)
             _URL = @@API_URL + "categories?count=100&offset=" + (_Offset + (i * 100)).to_s
             _responses << JSON.parse(RestClient.get(_URL)).select do |hash|
                 hash["clues_count"] == 5

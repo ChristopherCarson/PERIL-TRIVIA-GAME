@@ -10,7 +10,51 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_04_102347) do
+ActiveRecord::Schema.define(version: 2019_04_20_015446) do
+
+  create_table "categories", force: :cascade do |t|
+    t.text "name"
+    t.text "type"
+    t.integer "api_category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "categories_game_boards", force: :cascade do |t|
+    t.integer "game_board_id"
+    t.integer "category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_categories_game_boards_on_category_id"
+    t.index ["game_board_id"], name: "index_categories_game_boards_on_game_board_id"
+  end
+
+  create_table "clues", force: :cascade do |t|
+    t.integer "category_id"
+    t.integer "value"
+    t.text "question"
+    t.text "answer"
+    t.integer "api_clue_id"
+    t.integer "api_category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_clues_on_category_id"
+  end
+
+  create_table "game_boards", force: :cascade do |t|
+    t.integer "game_id"
+    t.string "game_type"
+    t.integer "multiplier"
+    t.integer "cleared_clues_ids"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_game_boards_on_game_id"
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "room_messages", force: :cascade do |t|
     t.integer "room_id"
