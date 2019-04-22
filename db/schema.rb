@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_20_015446) do
+ActiveRecord::Schema.define(version: 2019_04_21_220442) do
 
   create_table "categories", force: :cascade do |t|
     t.text "name"
@@ -39,6 +39,15 @@ ActiveRecord::Schema.define(version: 2019_04_20_015446) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_clues_on_category_id"
+  end
+
+  create_table "finished_clues", force: :cascade do |t|
+    t.integer "game_board_id"
+    t.integer "clue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clue_id"], name: "index_finished_clues_on_clue_id"
+    t.index ["game_board_id"], name: "index_finished_clues_on_game_board_id"
   end
 
   create_table "game_boards", force: :cascade do |t|
