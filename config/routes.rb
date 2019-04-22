@@ -15,6 +15,9 @@ Rails.application.routes.draw do
         collection do
       get :buzzer
       get :playerReady
+      get :buzzerModal
+      get :startGame
+      get :answer
     end
   end
 end

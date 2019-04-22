@@ -1,7 +1,4 @@
-<% 
-@gameStarted = true
-@buzzerModalClue = ""
-%>
+<%@gameStarted = $gameStarted[@room.id][0]%>
 
 <div class="master" data-channel-subscribe="room" data-room-id="<%= @room.id %>">
 <table style="width:100%">
@@ -13,7 +10,7 @@
       </th>
       <th width=20% style="text-align:right;">
          <h3>
-            $10,900
+            <!-- Accumulated Winnings go here -->
          </h3>
       </th>
    </tr>
@@ -22,48 +19,18 @@
    <% if @gameStarted %>
    <table style="width:100%" id="t01">
       <tr>
-         <th width=20%><%= $startingBoard[@room.id].categories[0].name %></th>
-         <th width=20%><%= $startingBoard[@room.id].categories[1].name %></th>
-         <th width=20%><%= $startingBoard[@room.id].categories[2].name %></th>
-         <th width=20%><%= $startingBoard[@room.id].categories[3].name %></th>
-         <th width=auto><%= $startingBoard[@room.id].categories[4].name %></th>
+         <% $games[@room.id].game_boards[0].categories.each do |cat|%>
+            <th width=16.66%><%= cat.name.upcase %></th>
+         <% end %>
       </tr>
+      <% for clueIndex in (0...5) %>
       <tr>
-         <td><button type="button" class='btn btn-primary btn-lg' data-toggle="modal" data-target="#buzzerModal" 
-            onClick=<%@buzzerModalClue=$startingBoard[@room.id].categories[0].clues[0].id%>>100</button></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>100<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>100<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>100<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>100<% end %></td>
+         <% for index in (0...6) %>
+            <td><%= link_to buzzerModal_rooms_path(:cat => index, :clue => clueIndex, :room => @room.id, :board => @baord), class: 'btn btn-primary btn-lg', 
+               remote: true do %><%= $games[@room.id].game_boards[0].categories[index].clues[clueIndex].value %><% end %></td>
+         <% end %>
       </tr>
-      <tr>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>200<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>200<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>200<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>200<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>200<% end %></td>
-      </tr>
-      <tr>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>300<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>300<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>300<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>300<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>300<% end %></td>
-      </tr>
-      <tr>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>400<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>400<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>400<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>400<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>400<% end %></td>
-      </tr>
-      <tr>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>500<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>500<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>500<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>500<% end %></td>
-         <td><%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-primary btn-lg', remote: true do %>500<% end %></td>
-      </tr>
+      <% end %>
    </table>
    <br/><br/>
    <% else %>
@@ -133,7 +100,7 @@
          <% if @gameStarted %> 
          <% else %>
          <div style="text-align:left;">
-            <%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-success', remote: true do %>
+            <%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-outline-success', remote: true do %>
             READY
             <% end %>
          </div>
@@ -142,27 +109,30 @@
       <th width=60%>
          <div class="alert alert-success" style="text-align:center; margin: auto;" data-role="display-ready-players">
             <% if @gameStarted %>  
-            This is where messages and User input take place.
+            Player <%=$gameStarted[@room.id][1]%>, it's your turn to choose a categry.
             <% else %>
             Players Ready:<br/>
             <% if $usersReady[@room.id].present? %>
-            <% $usersReady[@room.id].each do |player| %>
-            <%= player %><br />
-            <% end %> 
+               <% $usersReady[@room.id].each do |player| %>
+               <%= player[1] %><br />
+               <% end %> 
             <% end %>
          </div>
          <% end %>         
          </div>
       </th>
       <th width=auto>
-         <% if @gameStarted %>  
-         <div style="text-align:right;">
-            <%= link_to playerReady_rooms_path(:room => @room.id), class: 'btn btn-success', remote: true do %>
-            SUBMIT
+                  <% if $usersReady[@room.id].present? %>
+         <% if $usersReady[@room.id].length > 1 %>
+         <% if !@gameStarted %>
+            <div style="text-align:right;">
+            <%= link_to startGame_rooms_path(:room => @room.id), class: 'btn btn-outline-warning', remote: true do %>
+            START
             <% end %>
-         </div>
-         <% else %>
-         <% end %>
+            <% end %>
+            <% end %>
+            <% end %>
+            
       </th>
    </tr>
 </table>
@@ -170,16 +140,34 @@
 <table style="width:60%; text-align:center; margin:auto">
    <tr>
       <th>
+         <% if $usersReady[@room.id].present? %>
          <p>
-            <img src="https://api.adorable.io/avatars/40/9ad574806427070b94735f216e9abdc1.png" class="avatar" alt="" data-role="user-avatar">
-            SecondPlayer<br/>$1,300
+            
+            <% if $usersReady[@room.id][0].present? %>
+            <h5>Player 1</h5>
+            <img src="<%=$usersReady[@room.id][0][2]%>" class="avatar" alt="" data-role="user-avatar">
+            <%=$usersReady[@room.id][0][1]%><br/>$<%=$usersReady[@room.id][0][3]%>
+            <% end %> 
          </p>
       </th>
       <th>
          <p>
-            <img src="https://api.adorable.io/avatars/40/cb3cc6699e0fd632910d5a5836d06359.png" class="avatar" alt="" data-role="user-avatar">
-            ThirdPlayer<br/>$4,700
+            <% if $usersReady[@room.id][1].present? %>
+            <h5>Player 2</h5>
+            <img src="<%=$usersReady[@room.id][1][2]%>" class="avatar" alt="" data-role="user-avatar">
+            <%=$usersReady[@room.id][1][1]%><br/>$<%=$usersReady[@room.id][0][3]%>
+            <% end %> 
          </p>
+      </th>
+      <th>
+         <p>
+            <% if $usersReady[@room.id][2].present? %>
+            <h5>Player 3</h5>
+            <img src="<%=$usersReady[@room.id][2][2]%>" class="avatar" alt="" data-role="user-avatar">
+            <%=$usersReady[@room.id][2][1]%><br/>$<%=$usersReady[@room.id][0][3]%>
+            <% end %> 
+         </p>
+         <% end %> 
       </th>
    </tr>
 </table>
@@ -189,36 +177,61 @@
    <%= link_to 'Destroy', @room, :method => :delete, :onclick => "return confirm('Are you sure you want to delete this Game Room?')" %>
 </div>
 
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buzzerModal">Launch demo modal</button>
-
-
-
-<!-- Modal -->
+<!-- Buzzer Modal -->
 <div class="modal fade" id="buzzerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-role="buzzerModal">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="exampleModalLongTitle">flea for $300</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title" id="exampleModalLongTitle" data-role="buzzerModalTitle"></h5>
       </div>
       <div class="modal-body">
-        
-        <div class="alert alert-info">
-  <strong><%=@buzzerModalClue%></strong>
-</div>
+         <div class="alert alert-info" data-role="buzzerModalClue">
+         </div>
       </div>
       <div class="modal-footer">
-           <div style="text-align:center;" disabled>
-      <%= link_to buzzer_rooms_path(:room => @room.id), class: 'btn btn-danger', remote: true do %>
-      BUZZER
-      <% end %>
+           <div style="text-align:center;" data-role="buzzerModalButton">
+            <%= link_to buzzer_rooms_path(:room => @room.id), class: 'btn btn-danger', remote: true do %>
+            BUZZER
+            <% end %>
    </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Answer Modal -->
+<div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" data-role="answerModal"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Who or What is...</h4>
+      </div>
+      <p style="text-align:center;" data-role="timer-countdown">10</p>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <i class="fas fa-envelope prefix grey-text"></i>
+          <%= form_tag answer_rooms_path,  :room => @room.id, remote: true, :method => :get  do %>
+          <%= text_field_tag :answer, nil, class: 'form-control', id: 'show-page'%>
+          <%= hidden_field_tag :room, @room.id, class: 'form-control', hide: true%>
+          <label data-error="wrong" data-success="right" for="answer-form">Your Answer (Spelling doesnt need to be perfect!)</label>
+          <div style="text-align:right;">
+          <%= submit_tag 'SUBMIT' , class: 'btn btn-primary'%>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<%
+#<div class="text-center">
+#  <a href="" class="btn btn-default btn-rounded mb-4" data-toggle="modal" data-target="#answerModal">Launch
+#    Answer Modal</a>
+#</div>
+%>
+
+
+
+</div><!-- Main Div End -->
