@@ -99,10 +99,6 @@ $(function() {
           //dataArea.text(JSON.stringify(data));
           console.log(data);
           
-          function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-          }
-          
           
         }
       }
