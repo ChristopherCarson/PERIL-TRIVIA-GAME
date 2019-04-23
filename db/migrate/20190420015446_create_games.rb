@@ -1,6 +1,10 @@
 class CreateGames < ActiveRecord::Migration[5.2]
   def change
     create_table :games do |t|
+        t.belongs_to :room, index: true
+        t.string :game_phase
+        t.integer :current_game_board 
+        
         t.timestamps
     end
     
@@ -31,6 +35,7 @@ class CreateGames < ActiveRecord::Migration[5.2]
     create_table :clues do |t|
       t.belongs_to :category, index: true
       t.integer :value
+      t.integer :position
       t.text :question
       t.text :answer
       t.integer :api_clue_id
