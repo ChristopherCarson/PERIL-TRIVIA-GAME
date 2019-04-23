@@ -29,8 +29,12 @@ class GameBoard < ActiveRecord::Base
         self.save()
     end
 
+    def getRemainingCluesCount
+        return self.getRemainingClues.count
+    end
+
     def getRemainingClues
-        self.clues.find_by_sql(
+        return self.clues.find_by_sql(
             "SELECT  clues.* FROM clues
              INNER JOIN categories ON clues.category_id = categories.id
              INNER JOIN categories_game_boards ON categories.id = categories_game_boards.category_id
@@ -41,7 +45,7 @@ class GameBoard < ActiveRecord::Base
     end
     
     def getRemainingCluesByCategory(category_id)
-        self.clues.find_by_sql(
+        return self.clues.find_by_sql(
             "SELECT  clues.* FROM clues
              INNER JOIN categories ON clues.category_id = categories.id
              INNER JOIN categories_game_boards ON categories.id = categories_game_boards.category_id
@@ -52,7 +56,7 @@ class GameBoard < ActiveRecord::Base
                 WHERE game_board_id = " + self.id.to_s + ")")
     end
     
-    def addFinishedClue(clue)
+    def removeClue(clue)
         self.finished_clues << FinishedClue.new(game_board_id: self.id, clue_id: clue.id)
     end
 end

@@ -2,6 +2,7 @@ class Clue < ApplicationRecord
     belongs_to :category
     validates_presence_of :category
     
+    validates :position, :presence => true
     validates :question, :presence => true
     validates :answer, :presence => true
     validates :value, :presence => true
