@@ -6,9 +6,9 @@ class Game < ApplicationRecord
     @@num_random_question_choices = 7
 
     #StartGame
-    def startGame()
+    def startGame(num_players)
         self.game_phase = "Start"
-        #TODO create all players with scores at 0
+        num_players.times {self.game.players << Player.new(score: 0)}
         self.moveGameToNextPhase()
         self.save()
     end
