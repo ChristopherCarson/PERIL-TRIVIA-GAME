@@ -10,6 +10,7 @@ class RoomsController < ApplicationController
   $answer = ''
   $winnings = 0
   $playerForMoney = 0
+  $answering = false
                    
 
   def index
@@ -81,7 +82,8 @@ class RoomsController < ApplicationController
     elsif $gameStarted[@room.id][2] == $usersReady[@room.id][2][0]
        $playerForMoney = 2
     end
-    answerCountDown(7)
+    $answering = true
+    answerCountDown(10)
   end
   
   def answerCountDown(i)
@@ -105,11 +107,26 @@ class RoomsController < ApplicationController
         if ( $usersReady[@room.id][2] != nil )
           winnings3 = $usersReady[@room.id][2][3]
         end
-        RoomChannel.broadcast_to @room,  nextPlayer: true, player: $gameStarted[@room.id][1], winnings1: winnings1, winnings2: winnings2, winnings3: winnings3
-        $gameStarted[@room.id][3] = true
+        if $answering == true
+          RoomChannel.broadcast_to @room,  noAnswer: true, player: $playerForMoney + 1
+          $answering = false
+          $gameStarted[@room.id][1] = $gameStarted[@room.id][1] + 1
+          if $gameStarted[@room.id][1] > $usersReady[@room.id].length
+            $gameStarted[@room.id][1] = 1
+          end
+          if $gameStarted[@room.id][1] == $playerForMoney + 1 #turn passes, but not to who just missed answering
+            $gameStarted[@room.id][1] = $gameStarted[@room.id][1] + 1
+          end
+          $usersReady[@room.id][ $playerForMoney ][3] = $usersReady[@room.id][ $playerForMoney ][3] - $winnings
+          answerCountDown(3)
+        else
+          RoomChannel.broadcast_to @room,  nextPlayer: true, player: $gameStarted[@room.id][1], winnings1: winnings1, winnings2: winnings2, winnings3: winnings3
+          $gameStarted[@room.id][3] = true
+        end
       end
     end
   end
+  
   
   def playerReady
     @room = Room.find(params[:room])
@@ -144,6 +161,7 @@ class RoomsController < ApplicationController
         $usersReady[@room.id][ $playerForMoney ][3] = $usersReady[@room.id][ $playerForMoney ][3] - $winnings
       end
       RoomChannel.broadcast_to @room,  answer: true, text: params[:answer] + " - " + correct, user: current_user.username
+      $answering = false
     end
   end
 

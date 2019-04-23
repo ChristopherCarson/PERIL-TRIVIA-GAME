@@ -85,6 +85,12 @@ $(function() {
             location.reload()
           }
           
+          if (data.noAnswer !=null){
+            var player = JSON.stringify(data.player);
+            player = player.substring(1, player.length-1);
+            playersReadyArea.text("Player " + player + " did not answer in time.")
+          }
+          
           if (data.nextPlayer !=null){
             var player = JSON.stringify(data.player);
             player = player.substring(1, player.length-1);
