@@ -28,7 +28,8 @@ class RoomsController < ApplicationController
     
     $games[@room.id] = Game.new()
     $games[@room.id].createGameBoard("single")
-    $gameStarted[@room.id] = [false, 1, 0]#second number is who's turn it is (numerically), third is the ID of the player guessing
+    $gameStarted[@room.id] = [false, 1, 0, true]#second number is who's turn it is (numerically), third is the ID of the player guessing
+                                          #fourth is if it is time to choose category
   end
 
   def show
@@ -56,8 +57,9 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:room])
     clueText = $games[@room.id].game_boards[0].categories[cat.to_i].clues[clue.to_i].question
     titleText = $games[@room.id].game_boards[0].categories[cat.to_i].name.upcase + " - " + $games[@room.id].game_boards[0].categories[cat.to_i].clues[clue.to_i].value.to_s
-    if current_user.id == $usersReady[@room.id][ $gameStarted[@room.id][1]-1 ][0] # Checks to see if the player who's turn it is chose the clue
+    if current_user.id == $usersReady[@room.id][ $gameStarted[@room.id][1]-1 ][0] && $gameStarted[@room.id][3] == true # Checks to see if the player who's turn it is chose the clue
       RoomChannel.broadcast_to @room,  buzzerModal: 1, user: current_user, clue: clueText, title: titleText, id: current_user.id
+      $gameStarted[@room.id][3] = false
     end
   end
   
@@ -65,26 +67,11 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:room])
     RoomChannel.broadcast_to @room,  buzzer: true, user: current_user
     $gameStarted[@room.id][2] = current_user.id #Sets the current user ID to the ID that is guessing
-    closeModalCountDown(2)
-  end
-  
-  def closeModalCountDown(i)
-    Thread.new do
-      Rails.application.executor.wrap do
-        while i > -1  do
-          RoomChannel.broadcast_to @room,  timer: i, user: current_user
-          sleep 1
-          i -=1
-        end
-        RoomChannel.broadcast_to @room,  closeClueModal: true
-        RoomChannel.broadcast_to @room,  guess: true, user: current_user
-        answerCountDown(15)
-      end
-    end
+    answerCountDown(10)
   end
   
   def answerCountDown(i)
-        Thread.new do
+    Thread.new do
       Rails.application.executor.wrap do
         while i > -1  do
           RoomChannel.broadcast_to @room,  timer: i, user: current_user
@@ -100,10 +87,10 @@ class RoomsController < ApplicationController
     Thread.new do
       Rails.application.executor.wrap do
         while i > -1  do
-          RoomChannel.broadcast_to @room,  timer: i, user: current_user
           sleep 1
           i -=1
         end
+        $gameStarted[@room.id][3] = true
         RoomChannel.broadcast_to @room,  nextPlayer: true, player: $gameStarted[@room.id][1]
       end
     end

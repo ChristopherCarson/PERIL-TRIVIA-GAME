@@ -12,6 +12,8 @@ $(function() {
         buzzerModalTitle = $('[data-role="buzzerModalTitle"]');
         buzzerModalButton = $('[data-role="buzzerModalButton"]');
         answerModal = $('[data-role="answerModal"]');
+        answerModalTitle = $('[data-role="answer-modal-title"]');
+        textInput = $('[id="text-input"]');
         
 
     $element.animate({ scrollTop: $element.prop("scrollHeight")}, 1000)        
@@ -41,12 +43,8 @@ $(function() {
           }
           
           if (data.closeAnswerModal !=null){
-            location.reload()
-            answerModal.modal('hide')
-          }
-          
-          if (data.guess !=null){
-            answerModal.modal('show')
+          textInput.val('');
+          answerModal.modal('hide');
           }
           
           if (data.start !=null){
@@ -54,7 +52,9 @@ $(function() {
           }
           
           if (data.nextPlayer !=null){
-            location.reload()
+            var player = JSON.stringify(data.player);
+            player = player.substring(1, player.length-1);
+            playersReadyArea.text("Player " + player + ", it's your turn to choose a category.")
           }
           
           
@@ -80,12 +80,13 @@ $(function() {
           }
           
           if (data.buzzer !=null){
+            buzzerModal.modal('hide')
+            answerModal.modal('show');
             var title = JSON.stringify(data.user.username);
             title = title.substring(1, title.length-1);
-            title = title + " has buzzed in first!";
-            buzzerModalTitle.text(title);
-            buzzerModalClue.text("");
-            buzzerModalButton.text("");
+            title = title + " is answering";
+            answerModalTitle.text(title);
+
           }
           
           if (data.usersReady !=null){

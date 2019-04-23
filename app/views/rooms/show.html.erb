@@ -109,7 +109,7 @@
       <th width=60%>
          <div class="alert alert-success" style="text-align:center; margin: auto;" data-role="display-ready-players">
             <% if @gameStarted %>  
-            Player <%=$gameStarted[@room.id][1]%>, it's your turn to choose a categry.
+            Player 1, start us off by choosing the first clue!
             <% else %>
             Players Ready:<br/>
             <% if $usersReady[@room.id].present? %>
@@ -123,7 +123,7 @@
       </th>
       <th width=auto>
                   <% if $usersReady[@room.id].present? %>
-         <% if $usersReady[@room.id].length > 1 %>
+         <% if $usersReady[@room.id].length > 0 %>
          <% if !@gameStarted %>
             <div style="text-align:right;">
             <%= link_to startGame_rooms_path(:room => @room.id), class: 'btn btn-outline-warning', remote: true do %>
@@ -205,14 +205,14 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">Who or What is...</h4>
+      <h3 class="modal-title w-100 font-weight-bold" data-role="answer-modal-title"></h3>
       </div>
       <p style="text-align:center;" data-role="timer-countdown">10</p>
       <div class="modal-body mx-3">
         <div class="md-form mb-5">
           <i class="fas fa-envelope prefix grey-text"></i>
           <%= form_tag answer_rooms_path,  :room => @room.id, remote: true, :method => :get  do %>
-          <%= text_field_tag :answer, nil, class: 'form-control', id: 'show-page'%>
+          <%= text_field_tag :answer, nil, class: 'form-control', id: 'text-input'%>
           <%= hidden_field_tag :room, @room.id, class: 'form-control', hide: true%>
           <label data-error="wrong" data-success="right" for="answer-form">Your Answer (Spelling doesnt need to be perfect!)</label>
           <div style="text-align:right;">
