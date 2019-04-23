@@ -88,10 +88,7 @@ class Game < ApplicationRecord
         current_board = self.game_boards.find(self.current_game_board)
         current_board.removeClue(current_board.clues.find(clue_id))
     end
-  
-    @@API_URL = "http://jservice.io/api/"
-    @@clue_sets = 100 
-  
+    
     #Creates a game board.
     def createGameBoard(boardtype)
         _gameboard = GameBoard.new(game_type: boardtype)
@@ -104,6 +101,28 @@ class Game < ApplicationRecord
     #########TO DO: OFFLOAD THIS CODE TO SOMEWHERE ELSE######
     @@API_URL = "http://jservice.io/api/"
     @@clue_sets = 100 
+    
+    def populateGameDBwithTestQuestions
+        #Single
+        for i in 1..20
+            test_cat = Category.new(name: "TEST " + i.to_s, api_category_id: rand(100000000))
+            test_cat.save()
+            for j in 1..5
+                test_clue = Clue.new(category_id: test_cat.id, api_clue_id: rand(100000000), position: j, value: j * 100, question: "TEST " + j.to_s, answer: "TEST " + j.to_s)
+                test_clue.save()
+            end
+        end
+        
+        #Double
+        for i in 1..20
+            test_cat = Category.new(name: "TEST " + i.to_s, api_category_id: rand(100000000))
+            test_cat.save()
+            for j in 1..5
+                test_clue =  Clue.new(category_id: test_cat.id, api_clue_id: rand(100000000), position: j, value: j * 200, question: "TEST " + j.to_s, answer: "TEST " + j.to_s)
+                test_clue.save()
+            end
+        end
+    end
     
     #Performs initial population of game database from API.
     #Only run on initial setup.
