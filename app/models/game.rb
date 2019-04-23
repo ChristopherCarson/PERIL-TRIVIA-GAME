@@ -95,10 +95,8 @@ class Game < ApplicationRecord
         self.game_boards << _gameboard
         
         _gameboard.getCategories()
-<<<<<<< HEAD
         self.save()
-=======
->>>>>>> refs/remotes/origin/master
+
         return _gameboard.id
     end
     
