@@ -88,7 +88,10 @@ class Game < ApplicationRecord
         current_board = self.game_boards.find(self.current_game_board)
         current_board.removeClue(current_board.clues.find(clue_id))
     end
-    
+  
+    @@API_URL = "http://jservice.io/api/"
+    @@clue_sets = 100 
+  
     #Creates a game board.
     def createGameBoard(boardtype)
         _gameboard = GameBoard.new(game_type: boardtype)

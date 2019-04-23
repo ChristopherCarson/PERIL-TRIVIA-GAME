@@ -4,6 +4,9 @@ class RoomsController < ApplicationController
   # @room = current room when applicable
   before_action :load_entities
   $usersReady = []
+  $games = []
+  $gameStarted = []
+                   
 
   def index
     @rooms = Room.all
@@ -22,13 +25,22 @@ class RoomsController < ApplicationController
     else
       render :new
     end
+    
+    $games[@room.id] = Game.new()
+    $games[@room.id].createGameBoard("single")
+    $gameStarted[@room.id] = [false, 1, 0]#second number is who's turn it is (numerically), third is the ID of the player guessing
   end
 
   def show
-    @room_message = RoomMessage.new room: @room
-    if @room.present?
-      @room_messages = @room.room_messages.includes(:user)
+    if $games[@room.id].present?
+      @room_message = RoomMessage.new room: @room
+      if @room.present?
+        @room_messages = @room.room_messages.includes(:user)
+      else
+        redirect_to rooms_path
+      end
     else
+      @room.destroy()
       redirect_to rooms_path
     end
   end
@@ -38,21 +50,61 @@ class RoomsController < ApplicationController
     redirect_to rooms_path
   end
   
-  def buzzer
+  def buzzerModal
+    cat = params[:cat]
+    clue = params[:clue]
     @room = Room.find(params[:room])
-    RoomChannel.broadcast_to @room,  command: "BUZZER", user: current_user
-    countdown()
+    clueText = $games[@room.id].game_boards[0].categories[cat.to_i].clues[clue.to_i].question
+    titleText = $games[@room.id].game_boards[0].categories[cat.to_i].name.upcase + " - " + $games[@room.id].game_boards[0].categories[cat.to_i].clues[clue.to_i].value.to_s
+    if current_user.id == $usersReady[@room.id][ $gameStarted[@room.id][1]-1 ][0] # Checks to see if the player who's turn it is chose the clue
+      RoomChannel.broadcast_to @room,  buzzerModal: 1, user: current_user, clue: clueText, title: titleText, id: current_user.id
+    end
   end
   
-  def countdown
+  def buzzer
+    @room = Room.find(params[:room])
+    RoomChannel.broadcast_to @room,  buzzer: true, user: current_user
+    $gameStarted[@room.id][2] = current_user.id #Sets the current user ID to the ID that is guessing
+    closeModalCountDown(2)
+  end
+  
+  def closeModalCountDown(i)
     Thread.new do
       Rails.application.executor.wrap do
-        i=10
         while i > -1  do
           RoomChannel.broadcast_to @room,  timer: i, user: current_user
           sleep 1
           i -=1
         end
+        RoomChannel.broadcast_to @room,  closeClueModal: true
+        RoomChannel.broadcast_to @room,  guess: true, user: current_user
+        answerCountDown(15)
+      end
+    end
+  end
+  
+  def answerCountDown(i)
+        Thread.new do
+      Rails.application.executor.wrap do
+        while i > -1  do
+          RoomChannel.broadcast_to @room,  timer: i, user: current_user
+          sleep 1
+          i -=1
+        end
+        RoomChannel.broadcast_to @room,  closeAnswerModal: true, user: current_user
+      end
+    end
+  end
+  
+  def nextPlayerCountDown(i)
+    Thread.new do
+      Rails.application.executor.wrap do
+        while i > -1  do
+          RoomChannel.broadcast_to @room,  timer: i, user: current_user
+          sleep 1
+          i -=1
+        end
+        RoomChannel.broadcast_to @room,  nextPlayer: true, player: $gameStarted[@room.id][1]
       end
     end
   end
@@ -62,10 +114,28 @@ class RoomsController < ApplicationController
     if $usersReady[@room.id] == nil
       $usersReady[@room.id] = []
     end
-    if !$usersReady[@room.id].include?(current_user.username)
-      $usersReady[@room.id].push(current_user.username)
+    if !$usersReady[@room.id].include?([current_user.id, current_user.username, current_user.avatar_url, 0])
+      $usersReady[@room.id].push([current_user.id, current_user.username, current_user.avatar_url, 0])
     end
     RoomChannel.broadcast_to @room,  command: "READY", usersReady: $usersReady[@room.id]
+  end
+  
+  def startGame
+    @room = Room.find(params[:room])
+    $gameStarted[@room.id][0] = true
+    RoomChannel.broadcast_to @room,  start: true, player: $gameStarted[@room.id][1]
+  end
+  
+  def answer
+    @room = Room.find(params[:room])
+    if current_user.id == $gameStarted[@room.id][2] # Checks to see if the guessing player is pressing the button.
+      $gameStarted[@room.id][1] = $gameStarted[@room.id][1] + 1
+        if $gameStarted[@room.id][1] > $usersReady[@room.id].length
+          $gameStarted[@room.id][1] = 1
+        end
+      RoomChannel.broadcast_to @room,  answer: true, text: params[:answer], user: current_user.username
+      nextPlayerCountDown(3)
+    end
   end
 
   def update

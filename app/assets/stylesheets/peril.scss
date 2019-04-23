@@ -1,4 +1,15 @@
-
+table#t01 {
+  color: white;
+  font-size: medium;
+  th, td {
+  padding: 15px;
+  text-align: center;
+}
+th {
+  background-color: #375a7f;
+  padding: 15px;
+}
+}
 
 .avatar {
   max-height:30px;
@@ -22,14 +33,14 @@
 }
 
 .game-board {
-  height: 50vh;
+  height: 45vh;
   border-radius: 5px 5px 0 0;
 }
 
 .chat {
   border: 1px solid lighten($secondary, 40%);
   background: #999;
-  height: 20vh;
+  height: 40vh;
   border-radius: 5px 5px 0 0;
   overflow-y: auto;
 
