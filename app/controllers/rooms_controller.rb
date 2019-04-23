@@ -81,7 +81,7 @@ class RoomsController < ApplicationController
     elsif $gameStarted[@room.id][2] == $usersReady[@room.id][2][0]
        $playerForMoney = 2
     end
-    answerCountDown(12)
+    answerCountDown(7)
   end
   
   def answerCountDown(i)
