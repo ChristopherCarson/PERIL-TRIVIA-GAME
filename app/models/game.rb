@@ -85,7 +85,7 @@ class Game < ApplicationRecord
     
     #Removes a clue from the current board.
     def removeClueFromCurrentBoard(clue_id)
-        current_board = self.game_boards.find(self.current_game_board)
+        current_board = self.game_boards[0]
         current_board.removeClue(current_board.clues.find(clue_id))
     end
     
@@ -95,6 +95,8 @@ class Game < ApplicationRecord
         self.game_boards << _gameboard
         
         _gameboard.getCategories()
+        self.save()
+
         return _gameboard.id
     end
     
