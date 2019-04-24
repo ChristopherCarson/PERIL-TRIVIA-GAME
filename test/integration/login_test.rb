@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class LoginTestTest < ActionDispatch::IntegrationTest
+class LoginTest < ActionDispatch::IntegrationTest
   test "access website" do
     https!
     get "/users/sign_in"
