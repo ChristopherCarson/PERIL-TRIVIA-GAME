@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   validates :username, uniqueness: true, presence: true
 
+  has_many :players
   has_many :room_messages,
            dependent: :destroy
 
