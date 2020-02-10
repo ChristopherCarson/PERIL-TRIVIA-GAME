@@ -1,7 +1,4 @@
-# Rails chat application
-Code of the rails chat tutorial from [iridakos.com](https://iridakos.com/tutorials/2019/04/04/creating-chat-application-rails-websockets.html)
 
-![Bash completion demo](https://iridakos.com/assets/images/posts/rails-chat-tutorial/rails-chat-tutorial.gif)
 
 # MIT License
 
